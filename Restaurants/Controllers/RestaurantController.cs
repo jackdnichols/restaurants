@@ -15,7 +15,7 @@ namespace Restaurants.Controllers
     {
         [HttpGet]
         [Route("api/getrestaurants")]
-        public System.Web.Http.Results.OkNegotiatedContentResult<List<Restaurant>> GetRestaurants()
+        public System.Web.Http.Results.OkNegotiatedContentResult<List<RestaurantModel>> GetRestaurants()
         {
             SqlDataReader reader = null;
             SqlConnection myConnection = new SqlConnection();
@@ -27,22 +27,11 @@ namespace Restaurants.Controllers
             myConnection.Open();
             reader = sqlCmd.ExecuteReader();
 
-            List<Restaurant> restaurantList = new List<Restaurant>();
-            Restaurant restaurant = null;
+            List<RestaurantModel> restaurantList = new List<RestaurantModel>();
+            RestaurantModel restaurant = null;
             while (reader.Read())
-            {
-                /*
-                 * [Restaurant_Id]
-                  ,[Restaurant_Name]
-                  ,[Address]
-                  ,[City]
-                  ,[State]
-                  ,[Zip_Code]
-                  ,[Email_Address]
-                  ,[Restaurant_Image_URL]
-                  ,[End_Date]
-                 */
-                restaurant = new Restaurant();
+            {                
+                restaurant = new RestaurantModel();
                 restaurant.RestaurantId = Convert.ToInt32(reader.GetValue(0));
                 restaurant.RestaurantName = Convert.ToString(reader.GetValue(1));
                 restaurant.Address = Convert.ToString(reader.GetValue(2));
@@ -56,6 +45,465 @@ namespace Restaurants.Controllers
             }
             myConnection.Close();
             return Ok(content: restaurantList);
+        }
+
+        [HttpGet]
+        [Route("api/getrestaurantsbyname/{restaurantName}")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<List<RestaurantModel>> GetRestaurantsByName(String restaurantName)
+        {
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
+            myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+            SqlCommand sqlCmd = new SqlCommand();
+            sqlCmd.CommandType = CommandType.StoredProcedure;
+            sqlCmd.CommandText = "spGetRestaurants_By_Name";
+            sqlCmd.Connection = myConnection;
+
+            SqlParameter parameter = new SqlParameter();
+            parameter.ParameterName = "@Restaurant_Name";
+            parameter.SqlDbType = SqlDbType.VarChar;
+            parameter.Size = 100;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = restaurantName;
+            sqlCmd.Parameters.Add(parameter);
+
+            myConnection.Open();
+            reader = sqlCmd.ExecuteReader();
+
+            List<RestaurantModel> restaurantList = new List<RestaurantModel>();
+            RestaurantModel restaurant = null;
+            while (reader.Read())
+            {                
+                restaurant = new RestaurantModel();
+                restaurant.RestaurantId = Convert.ToInt32(reader.GetValue(0));
+                restaurant.RestaurantName = Convert.ToString(reader.GetValue(1));
+                restaurant.Address = Convert.ToString(reader.GetValue(2));
+                restaurant.City = Convert.ToString(reader.GetValue(3));
+                restaurant.State = Convert.ToString(reader.GetValue(4));
+                restaurant.ZipCode = Convert.ToString(reader.GetValue(5));
+                restaurant.EmailAddress = Convert.ToString(reader.GetValue(6));
+                restaurant.RestaurantImageURL = Convert.ToString(reader.GetValue(7));
+                restaurant.EndDate = reader.IsDBNull(8) ? (DateTime?)null : (DateTime?)reader.GetDateTime(8);
+                restaurantList.Add(restaurant);
+            }
+            myConnection.Close();
+            return Ok(content: restaurantList);
+        }
+
+        [HttpPost]
+        [Route("api/saverestaurant")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveClinician([FromBody] RestaurantModel restaurant)
+        {
+            try
+            {
+                Int32 recordId = 0;
+
+                SqlConnection myConnection = new SqlConnection();
+                myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.CommandText = "spSaveRestaurant";
+                sqlCmd.CommandType = CommandType.StoredProcedure;
+                sqlCmd.Connection = myConnection;
+
+
+                SqlParameter parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.RestaurantId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Name";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 100;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value =  restaurant.RestaurantName;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Address";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.Address;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@City";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.City;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@State";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.State;
+                sqlCmd.Parameters.Add(parameter);
+                	
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Zip_Code";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 20;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.ZipCode;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Email_Address";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.EmailAddress;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Image_URL";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 1000;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.RestaurantImageURL;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Sales_Tax_Percent";
+                parameter.SqlDbType = SqlDbType.Decimal;
+                parameter.Size = 10;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.SalesTaxPercentage;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@End_Date";
+                parameter.SqlDbType = SqlDbType.DateTime;
+                parameter.Size = 8;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurant.EndDate;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Return_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Output;
+                sqlCmd.Parameters.Add(parameter);
+
+
+                myConnection.Open();
+                sqlCmd.ExecuteNonQuery();
+                recordId = (Int32)parameter.Value;
+                myConnection.Close();
+
+                ReturnCodeModel returnCodeModel = new ReturnCodeModel();
+                returnCodeModel.RecordId = recordId;
+                returnCodeModel.ReturnCode = "success";
+                returnCodeModel.Message = "The record has been saved successfully";
+
+                return Ok(content: returnCodeModel);
+            }
+            catch (Exception ex)
+            {
+                ExceptionModel.SaveException(ex.Message, System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString(), System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return null;
+            }
+        }
+
+        [HttpPost]
+        [Route("api/getrestaurantmenu")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<List<RestaurantMenuModel>> GetRestaurantMenu([FromBody] RestaurantMenuCriteriaModel restaurantMenuCriteria)
+        {
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
+            myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+            SqlCommand sqlCmd = new SqlCommand();
+            sqlCmd.CommandType = CommandType.StoredProcedure;
+            sqlCmd.CommandText = "spGetRestaurantMenu";
+            sqlCmd.Connection = myConnection;
+
+            SqlParameter parameter = new SqlParameter();
+            parameter.ParameterName = "@Restaurant_Id";
+            parameter.SqlDbType = SqlDbType.Int;
+            parameter.Size = 4;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = restaurantMenuCriteria.RestaurantId;
+            sqlCmd.Parameters.Add(parameter);
+
+            parameter = new SqlParameter();
+            parameter.ParameterName = "@Restaurant_Menu_Category_Id";
+            parameter.SqlDbType = SqlDbType.Int;
+            parameter.Size = 4;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = restaurantMenuCriteria.RestaurantMenuCategoryId;
+            sqlCmd.Parameters.Add(parameter);
+
+            myConnection.Open();
+            reader = sqlCmd.ExecuteReader();
+
+            int restaurantMenuIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Id");
+            int restaurantIdOrdinal = reader.GetOrdinal("Restaurant_Id");
+            int restaurantMenuCategoryIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Category_Id");
+            int menuCategoryOrdinal = reader.GetOrdinal("Menu_Category");
+            int menuItemOrdinal = reader.GetOrdinal("Menu_Item");
+            int menuCostOrdinal = reader.GetOrdinal("Menu_Cost");
+            int sortIndexOrdinal = reader.GetOrdinal("Sort_Index");
+            int endDateOrdinal = reader.GetOrdinal("End_Date");
+
+            List<RestaurantMenuModel> restaurantMenuList = new List<RestaurantMenuModel>();
+            RestaurantMenuModel restaurantMenu = null;
+            while (reader.Read())
+            {
+                restaurantMenu = new RestaurantMenuModel();
+                restaurantMenu.RestaurantMenuId = reader.GetInt32(restaurantMenuIdOrdinal);
+                restaurantMenu.RestaurantId = reader.GetInt32(restaurantIdOrdinal);
+                restaurantMenu.RestaurantMenuCategoryId = reader.GetInt32(restaurantMenuCategoryIdOrdinal);
+                restaurantMenu.MenuCategory = reader.GetString(menuCategoryOrdinal);
+                restaurantMenu.MenuItem = reader.GetString(menuItemOrdinal);
+                restaurantMenu.MenuCost = reader.GetDecimal(menuCostOrdinal);
+                restaurantMenu.SortIndex = reader.GetInt32(sortIndexOrdinal);
+                restaurantMenu.EndDate = reader.IsDBNull(endDateOrdinal) ? (DateTime?)null : (DateTime?)reader.GetDateTime(endDateOrdinal);
+                restaurantMenuList.Add(restaurantMenu);
+            }
+            myConnection.Close();
+            return Ok(content: restaurantMenuList);
+        }
+
+        [HttpPost]
+        [Route("api/saverestaurantmenu")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenu([FromBody] RestaurantMenuModel restaurantMenu)
+        {
+            try
+            {
+                Int32 recordId = 0;
+
+                SqlConnection myConnection = new SqlConnection();
+                myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.CommandText = "spSaveRestaurantMenu";
+                sqlCmd.CommandType = CommandType.StoredProcedure;
+                sqlCmd.Connection = myConnection;
+
+
+                SqlParameter parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Menu_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.RestaurantMenuId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.RestaurantId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Menu_Category_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.RestaurantMenuCategoryId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Menu_Category";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.MenuCategory;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Menu_Item";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 50;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.MenuItem;
+                sqlCmd.Parameters.Add(parameter);
+                	
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Menu_Cost";
+                parameter.SqlDbType = SqlDbType.Decimal;
+                parameter.Size = 8;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.MenuCost;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Sort_Index";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.SortIndex;
+                sqlCmd.Parameters.Add(parameter);
+                
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@End_Date";
+                parameter.SqlDbType = SqlDbType.DateTime;
+                parameter.Size = 8;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenu.EndDate;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Return_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Output;
+                sqlCmd.Parameters.Add(parameter);
+
+
+                myConnection.Open();
+                sqlCmd.ExecuteNonQuery();
+                recordId = (Int32)parameter.Value;
+                myConnection.Close();
+
+                ReturnCodeModel returnCodeModel = new ReturnCodeModel();
+                returnCodeModel.RecordId = recordId;
+                returnCodeModel.ReturnCode = "success";
+                returnCodeModel.Message = "The record has been saved successfully";
+
+                return Ok(content: returnCodeModel);
+            }
+            catch (Exception ex)
+            {
+                ExceptionModel.SaveException(ex.Message, System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString(), System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return null;
+            }
+        }
+
+        [HttpGet]
+        [Route("api/getrestaurantmenucategories/{restaurantId}")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<List<RestaurantMenuCategoryModel>> GetRestaurantsMenuCategories(Int32 restaurantId)
+        {
+            SqlDataReader reader = null;
+            SqlConnection myConnection = new SqlConnection();
+            myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+            SqlCommand sqlCmd = new SqlCommand();
+            sqlCmd.CommandType = CommandType.StoredProcedure;
+            sqlCmd.CommandText = "spGetRestaurantMenuCategory";
+            sqlCmd.Connection = myConnection;
+
+            SqlParameter parameter = new SqlParameter();
+            parameter.ParameterName = "@Restaurant_Id";
+            parameter.SqlDbType = SqlDbType.Int;
+            parameter.Size = 3;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = restaurantId;
+            sqlCmd.Parameters.Add(parameter);
+
+            myConnection.Open();
+            reader = sqlCmd.ExecuteReader();
+
+            int restaurantMenuCategoryIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Category_Id");
+            int restaurantIdOrdinal = reader.GetOrdinal("Restaurant_Id");
+            int restaurantMenuCategoryOrdinal = reader.GetOrdinal("Restaurant_Menu_Category");
+            int sortIndexOrdinal = reader.GetOrdinal("Sort_Index");
+            int endDateOrdinal = reader.GetOrdinal("End_Date");
+
+            List <RestaurantMenuCategoryModel> restaurantList = new List<RestaurantMenuCategoryModel>();
+            RestaurantMenuCategoryModel restaurant = null;
+            while (reader.Read())
+            {
+                restaurant = new RestaurantMenuCategoryModel();
+                restaurant.RestaurantMenuCategoryId = reader.GetInt32(restaurantMenuCategoryIdOrdinal);
+                restaurant.RestaurantId = reader.GetInt32(restaurantIdOrdinal);
+                restaurant.RestaurantMenuCategory = reader.GetString(restaurantMenuCategoryOrdinal);
+                restaurant.SortIndex = reader.GetInt32(sortIndexOrdinal);
+                restaurant.EndDate = reader.IsDBNull(endDateOrdinal) ? (DateTime?)null : (DateTime?)reader.GetDateTime(endDateOrdinal);
+                restaurantList.Add(restaurant);
+            }
+            myConnection.Close();
+            return Ok(content: restaurantList);
+        }
+
+        [HttpPost]
+        [Route("api/saverestaurantmenucategory")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenu([FromBody] RestaurantMenuCategoryModel restaurantMenuCategory)
+        {
+            try
+            {
+                Int32 recordId = 0;
+
+                SqlConnection myConnection = new SqlConnection();
+                myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.CommandText = "spSaveRestaurantMenuCategory";
+                sqlCmd.CommandType = CommandType.StoredProcedure;
+                sqlCmd.Connection = myConnection;
+
+                SqlParameter parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Menu_Category_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenuCategory.RestaurantMenuCategoryId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenuCategory.RestaurantId;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Menu_Category";
+                parameter.SqlDbType = SqlDbType.VarChar;
+                parameter.Size = 150;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenuCategory.RestaurantMenuCategory;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Sort_Index";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenuCategory.SortIndex;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@End_Date";
+                parameter.SqlDbType = SqlDbType.DateTime;
+                parameter.Size = 8;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Value = restaurantMenuCategory.EndDate;
+                sqlCmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter();
+                parameter.ParameterName = "@Return_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Size = 4;
+                parameter.Direction = ParameterDirection.Output;
+                sqlCmd.Parameters.Add(parameter);
+
+
+                myConnection.Open();
+                sqlCmd.ExecuteNonQuery();
+                recordId = (Int32)parameter.Value;
+                myConnection.Close();
+
+                ReturnCodeModel returnCodeModel = new ReturnCodeModel();
+                returnCodeModel.RecordId = recordId;
+                returnCodeModel.ReturnCode = "success";
+                returnCodeModel.Message = "The record has been saved successfully";
+
+                return Ok(content: returnCodeModel);
+            }
+            catch (Exception ex)
+            {
+                ExceptionModel.SaveException(ex.Message, System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString(), System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return null;
+            }
         }
 
         public void SaveTemporaryPassword(String loginId, String temporaryPassword)
@@ -265,31 +713,6 @@ namespace Restaurants.Controllers
             }
         }
 
-        // GET: api/Restaurant
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET: api/Restaurant/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST: api/Restaurant
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT: api/Restaurant/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Restaurant/5
-        public void Delete(int id)
-        {
-        }
+       
     }
 }

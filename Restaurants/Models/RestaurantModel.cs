@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Restaurants.Models
 {
-    public class Restaurant
+    public class RestaurantModel
     {
         private Int32 restaurantId;
         private String restaurantName;
@@ -15,6 +15,7 @@ namespace Restaurants.Models
         private String zipCode;
         private String emailAddress;
         private String restaurantImageURL;
+        private Decimal salesTaxPercentage;
         private DateTime? endDate;
 
         public Int32 RestaurantId { get => restaurantId; set => restaurantId = value; }
@@ -26,5 +27,6 @@ namespace Restaurants.Models
         public string EmailAddress { get => emailAddress; set => emailAddress = value; }
         public string RestaurantImageURL { get => restaurantImageURL; set => restaurantImageURL = value; }
         public DateTime? EndDate { get => endDate; set => endDate = value; }
+        public decimal SalesTaxPercentage { get => salesTaxPercentage; set => salesTaxPercentage = value; }
     }
 }

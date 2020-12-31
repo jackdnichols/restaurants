@@ -337,7 +337,11 @@
     <Compile Include="Models\LoginResponse.cs" />
     <Compile Include="Models\LoginReturnModel.cs" />
     <Compile Include="Models\ResponseModel.cs" />
-    <Compile Include="Models\Restaurant.cs" />
+    <Compile Include="Models\RestaurantMenuCategoryModel.cs" />
+    <Compile Include="Models\RestaurantMenuCriteriaModel.cs" />
+    <Compile Include="Models\RestaurantMenuModel.cs" />
+    <Compile Include="Models\RestaurantModel.cs" />
+    <Compile Include="Models\ReturnCodeModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\SystemUser.cs" />
     <Compile Include="Models\SystemUserModel.cs" />
