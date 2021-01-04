@@ -7,9 +7,9 @@ using System.Web.Http;
 
 namespace Restaurants.Controllers
 {
+    [System.Web.Http.Cors.EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ValuesController : ApiController
-    {
-        [System.Web.Http.Cors.EnableCors(origins: "*", headers: "*", methods: "*")]
+    {        
         // GET api/values
         public IEnumerable<string> Get()
         {
