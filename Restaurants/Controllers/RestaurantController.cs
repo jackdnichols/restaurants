@@ -92,7 +92,7 @@ namespace Restaurants.Controllers
 
         [HttpPost]
         [Route("api/saverestaurant")]
-        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveClinician([FromBody] RestaurantModel restaurant)
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurant([FromBody] RestaurantModel restaurant)
         {
             try
             {
@@ -426,7 +426,7 @@ namespace Restaurants.Controllers
 
         [HttpPost]
         [Route("api/saverestaurantmenucategory")]
-        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenu([FromBody] RestaurantMenuCategoryModel restaurantMenuCategory)
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenuCategory([FromBody] RestaurantMenuCategoryModel restaurantMenuCategory)
         {
             try
             {
