@@ -274,7 +274,7 @@ namespace Restaurants.Controllers
 
         [HttpPost]
         [Route("api/saverestaurantmenu")]
-        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenu([FromBody] RestaurantMenuModel restaurantMenu)
+        public System.Web.Http.Results.OkNegotiatedContentResult<ReturnCodeModel> SaveRestaurantMenu([FromBody] RestaurantMenuCriteria restaurantMenuCriteria)
         {
             try
             {
@@ -293,7 +293,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.Int;
                 parameter.Size = 4;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.RestaurantMenuId;
+                parameter.Value = restaurantMenuCriteria.RestaurantMenuId;
                 sqlCmd.Parameters.Add(parameter);
 
                 parameter = new SqlParameter();
@@ -301,7 +301,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.Int;
                 parameter.Size = 4;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.RestaurantId;
+                parameter.Value = restaurantMenuCriteria.RestaurantId;
                 sqlCmd.Parameters.Add(parameter);
 
                 parameter = new SqlParameter();
@@ -309,15 +309,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.Int;
                 parameter.Size = 4;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.RestaurantMenuCategoryId;
-                sqlCmd.Parameters.Add(parameter);
-
-                parameter = new SqlParameter();
-                parameter.ParameterName = "@Menu_Category";
-                parameter.SqlDbType = SqlDbType.VarChar;
-                parameter.Size = 50;
-                parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.MenuCategory;
+                parameter.Value = restaurantMenuCriteria.RestaurantMenuCategoryId;
                 sqlCmd.Parameters.Add(parameter);
 
                 parameter = new SqlParameter();
@@ -325,7 +317,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.VarChar;
                 parameter.Size = 50;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.MenuItem;
+                parameter.Value = restaurantMenuCriteria.MenuItem;
                 sqlCmd.Parameters.Add(parameter);
                 	
                 parameter = new SqlParameter();
@@ -333,7 +325,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.Decimal;
                 parameter.Size = 8;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.MenuCost;
+                parameter.Value = restaurantMenuCriteria.MenuCost;
                 sqlCmd.Parameters.Add(parameter);
 
                 parameter = new SqlParameter();
@@ -341,7 +333,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.Int;
                 parameter.Size = 4;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.SortIndex;
+                parameter.Value = restaurantMenuCriteria.SortIndex;
                 sqlCmd.Parameters.Add(parameter);
                 
                 parameter = new SqlParameter();
@@ -349,7 +341,7 @@ namespace Restaurants.Controllers
                 parameter.SqlDbType = SqlDbType.DateTime;
                 parameter.Size = 8;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.Value = restaurantMenu.EndDate;
+                parameter.Value = restaurantMenuCriteria.EndDate;
                 sqlCmd.Parameters.Add(parameter);
 
                 parameter = new SqlParameter();
@@ -742,7 +734,7 @@ namespace Restaurants.Controllers
                 int restaurantMenuIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Id");
                 int restaurantIdOrdinal = reader.GetOrdinal("Restaurant_Id");
                 int restaurantMenuCategoryIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Category_Id");
-                int menuCategoryOrdinal = reader.GetOrdinal("Menu_Category");
+                int menuCategoryOrdinal = reader.GetOrdinal("Restaurant_Menu_Category");
                 int menuItemOrdinal = reader.GetOrdinal("Menu_Item");
                 int menuCostOrdinal = reader.GetOrdinal("Menu_Cost");
                 int sortIndexOrdinal = reader.GetOrdinal("Sort_Index");
