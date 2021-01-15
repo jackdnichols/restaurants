@@ -713,6 +713,68 @@ namespace Restaurants.Controllers
             }
         }
 
-       
+        [HttpPost]
+        [Route("api/getrestaurantmenuitems")]
+        public System.Web.Http.Results.OkNegotiatedContentResult<List<RestaurantMenuModel>> GetRestaurantMenuItems([FromBody] RestaurantMenuItemParameterModel restaurantMenuItemParameterModel)
+        {
+            try
+            {
+                SqlDataReader reader = null;
+                SqlConnection myConnection = new SqlConnection();
+                myConnection.ConnectionString = System.Configuration.ConfigurationManager.AppSettings["DBConnection"];
+                SqlCommand sqlCmd = new SqlCommand();
+
+                sqlCmd.CommandText = "spGetRestaurantMenuItems";
+                sqlCmd.CommandType = CommandType.StoredProcedure;
+                sqlCmd.Connection = myConnection;
+
+                SqlParameter parameter = new SqlParameter();
+                parameter.ParameterName = "@Restaurant_Id";
+                parameter.SqlDbType = SqlDbType.Int;
+                parameter.Direction = ParameterDirection.Input;
+                parameter.Size = 4;
+                parameter.Value = restaurantMenuItemParameterModel.RestaurantId;
+                sqlCmd.Parameters.Add(parameter);
+
+                myConnection.Open();
+                reader = sqlCmd.ExecuteReader();
+
+                int restaurantMenuIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Id");
+                int restaurantIdOrdinal = reader.GetOrdinal("Restaurant_Id");
+                int restaurantMenuCategoryIdOrdinal = reader.GetOrdinal("Restaurant_Menu_Category_Id");
+                int menuCategoryOrdinal = reader.GetOrdinal("Menu_Category");
+                int menuItemOrdinal = reader.GetOrdinal("Menu_Item");
+                int menuCostOrdinal = reader.GetOrdinal("Menu_Cost");
+                int sortIndexOrdinal = reader.GetOrdinal("Sort_Index");
+                int endDateOrdinal = reader.GetOrdinal("End_Date");
+
+                List<RestaurantMenuModel> restaurantMenuModelList = new List<RestaurantMenuModel>();
+                RestaurantMenuModel restaurantMenuModel = null;
+
+                while (reader.Read())
+                {
+                    restaurantMenuModel = new RestaurantMenuModel();
+                    restaurantMenuModel.RestaurantMenuId = reader.GetInt32(restaurantMenuIdOrdinal);
+                    restaurantMenuModel.RestaurantId = reader.GetInt32(restaurantIdOrdinal);
+                    restaurantMenuModel.RestaurantMenuCategoryId = reader.GetInt32(restaurantMenuCategoryIdOrdinal);
+                    restaurantMenuModel.MenuCategory = reader.GetString(menuCategoryOrdinal);
+                    restaurantMenuModel.MenuItem = reader.GetString(menuItemOrdinal);
+                    restaurantMenuModel.MenuCost = reader.GetDecimal(menuCostOrdinal);
+                    restaurantMenuModel.SortIndex = reader.GetInt32(sortIndexOrdinal);                    
+                    restaurantMenuModel.EndDate = (reader.IsDBNull(endDateOrdinal) ? (DateTime?)null : (DateTime?)reader.GetDateTime(endDateOrdinal));
+                    restaurantMenuModelList.Add(restaurantMenuModel);
+                }
+
+                myConnection.Close();
+
+                return Ok(content: restaurantMenuModelList);
+            }
+            catch (Exception ex)
+            {
+                ExceptionModel.SaveException(ex.Message, System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString(), System.Reflection.MethodInfo.GetCurrentMethod().Name);
+                return null;
+            }
+        }
+        
     }
 }

@@ -16,7 +16,7 @@
     <AssemblyName>Restaurants</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44335</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
@@ -339,6 +339,7 @@
     <Compile Include="Models\ResponseModel.cs" />
     <Compile Include="Models\RestaurantMenuCategoryModel.cs" />
     <Compile Include="Models\RestaurantMenuCriteriaModel.cs" />
+    <Compile Include="Models\RestaurantMenuItemParameterModel.cs" />
     <Compile Include="Models\RestaurantMenuModel.cs" />
     <Compile Include="Models\RestaurantModel.cs" />
     <Compile Include="Models\ReturnCodeModel.cs" />
@@ -561,7 +562,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56736</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44335/</IISUrl>
+          <IISUrl>https://api.restaurants.nicholssoftware.com</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
